@@ -8,7 +8,7 @@
 <meta property="og:title" content="Wander Nearby | Berlin">
 <meta property="og:description" content="Monuments, museums, and murals — planned as a walkable day.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://yoursite.netlify.app/">
+<meta property="og:url" content="https://wander-nearby-berlin.netlify.app/">
 <meta property="og:image" content="https://images.unsplash.com/photo-1599946347335-f79abb1ca0e9?w=1200&auto=format&fit=crop&q=80">
 <meta property="og:site_name" content="Wander Nearby">
 <meta name="twitter:card" content="summary_large_image">
@@ -16,7 +16,7 @@
 <meta name="twitter:description" content="A practical English field guide to Berlin: Brandenburg Gate, Museum Island, East Side Gallery, Kreuzberg, and a one-day walking route.">
 <meta name="twitter:image" content="https://images.unsplash.com/photo-1599946347335-f79abb1ca0e9?w=1200&auto=format&fit=crop&q=80">
 <meta name="theme-color" content="#B93B2C">
-<link rel="canonical" href="https://yoursite.netlify.app/">
+<link rel="canonical" href="https://wander-nearby-berlin.netlify.app/">
 <link rel="manifest" href="./manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -1616,22 +1616,40 @@ html.theme-fade .price-btn, html.theme-fade section, html.theme-fade .site-heade
   .stop{ break-inside:avoid; border:1px solid #000; }
   section{ border-bottom:1px solid #000; padding:24px 0; }
 }
-/* ===== Final override: remove the background glow from Stay & Eat ===== */
-.stay-block::after,
-.stay-block::before{
+/* ===== Final override v2: calm, natural animations everywhere ===== */
+
+/* Kill every leftover glow/blob/stripe pseudo-element, cards and stay-blocks alike */
+.cards-container .card::after, .cards-container .card::before,
+.stay-block::after, .stay-block::before,
+.spotlight .panel::after{
   content:none !important;
   display:none !important;
   animation:none !important;
+  background-image:none !important;
 }
 
-/* Replace it with a clean colored top border per stop, no glow */
-.stay-block{ border-top:4px solid transparent; }
+/* Clean colored top border, same identity, no glow */
+.stay-block{ border-top:4px solid transparent; overflow:hidden; }
 #stay-brandenburg{ border-top-color:var(--red); }
 #stay-museum{ border-top-color:var(--blue); }
 #stay-eastside{ border-top-color:var(--yellow); }
 #stay-kreuzberg{ border-top-color:#2e9d5b; }
 
-/* Top-rated badge: useful, subtle, no background animation */
+/* Natural shine sweep on hover — cards and stay-blocks */
+.cards-container .card, .stay-block{ position:relative; overflow:hidden; }
+.cards-container .card .shine, .stay-block .shine{
+  position:absolute; top:0; left:-60%; width:40%; height:100%;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,.22), transparent);
+  transform:skewX(-20deg); pointer-events:none; z-index:4;
+  transition:left .8s cubic-bezier(.2,.7,.2,1);
+}
+.cards-container .card:hover .shine, .stay-block:hover .shine{ left:130%; }
+[data-theme="dark"] .cards-container .card .shine,
+[data-theme="dark"] .stay-block .shine{
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,.10), transparent);
+}
+
+/* Top-rated badge: useful, subtle pop-in */
 .top-rated-badge{
   display:inline-flex; align-items:center; gap:5px;
   font-size:11px; font-weight:700; letter-spacing:.02em;
@@ -1641,7 +1659,11 @@ html.theme-fade .price-btn, html.theme-fade section, html.theme-fade .site-heade
   animation:badgePop .4s cubic-bezier(.2,.8,.3,1.4);
 }
 @keyframes badgePop{ from{ transform:scale(0); opacity:0; } to{ transform:scale(1); opacity:1; } }
-@media (prefers-reduced-motion: reduce){ .top-rated-badge{ animation:none; } }
+
+@media (prefers-reduced-motion: reduce){
+  .top-rated-badge{ animation:none; }
+  .cards-container .card .shine, .stay-block .shine{ display:none; }
+}
 </style>
 </head>
 <body>
@@ -3505,6 +3527,17 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   });
 }
+</script>
+<script>
+(function(){
+  document.querySelectorAll('.cards-container .card, .stay-block').forEach(el => {
+    if (!el.querySelector(':scope > .shine')){
+      const shine = document.createElement('div');
+      shine.className = 'shine';
+      el.appendChild(shine);
+    }
+  });
+})();
 </script>
 </body>
 </html>
